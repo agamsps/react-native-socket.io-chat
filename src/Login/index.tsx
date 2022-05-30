@@ -2,10 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
   StyleSheet,
   Button, TextInput, SafeAreaView
-} from 'react-native';
+} from 'react-native'
 import { chatClient } from '../client';
 
-const Home = (props: any) => {
+const Login = (props: any) => {
 
   //should be used to send and receive message in same channel
   const [userName, setUserName] = useState('')
@@ -13,38 +13,36 @@ const Home = (props: any) => {
   //set userName which should be unique
   const [userId, setUserId] = useState('')
 
-  const [channelName, setChannelName] = useState('')
-
-
+ 
   useEffect(() => {
 
-    let username = props.route.params.userName
-    let userId = props.route.params.userId
 
-    setUserName(username)
-    setUserId(userId)
-
-
-  }, [userId, userName])
+  }, [])
 
   const onJoin = async () => {
 
-    const channel = chatClient.channel('messaging', channelName, {
-      name: 'Awesome channel about traveling',
-    });
 
-    channel.create()
-    .then( response => {
+   chatClient.connectUser(
+        {
+            id: userId,
+            name: userName,
+            image: 'https://getstream.io/random_svg/?name=John',
+        },
+        chatClient.devToken(userId),
+    ).then( (response: any) => {
 
-      console.log(response)
+       
+        console.log(response)
 
-      props.navigation.navigate('Chats', { channel: channelName, userId: userId, userName : userName });
-  }
+        props.navigation.navigate('DashboardStack', { userId: userId, userName: userName });
 
-  ).catch(ex => {
-      console.log(ex)
-  }) ;
+    }
 
+    ).catch(ex => {
+        console.log(ex)
+    }) ;
+
+    
   }
   return (
 
@@ -54,16 +52,22 @@ const Home = (props: any) => {
 
       <TextInput
         style={styles.inputContainerStyle}
-        placeholder="channel"
-        value={channelName}
-        onChangeText={(text: string) => setChannelName(text)}
-      />
+        placeholder="userId"
+        value={userId}
+        onChangeText={(text: string) => setUserId(text)}
+        />
 
+      <TextInput
+        style={styles.inputContainerStyle}
+        placeholder="username"
+        value={userName}
+        onChangeText={(text: string) => setUserName(text)}
+        />
       <Button
         title='join channel'
         onPress={() => onJoin()
-        }
-      />
+        } 
+        />
 
     </SafeAreaView>
   );
@@ -94,4 +98,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default Login;
